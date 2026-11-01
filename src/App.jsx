@@ -1,55 +1,79 @@
 import { useState , useEffect } from "react";
 import "react";
-
 function App() {
-  
+
   const [title, setTitle] = useState("");
   const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
-    fetch("https://smart-todo-inyc.onrender.com/api/tasks/")
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Failed to fetch tasks");
-            }
-            return response.json();
-        })
-        .then(data => {
-            setTasks(data);
-        })
-        .catch(error => {
-            console.error("Error fetching tasks:", error);
-        });
-}, []);
-  function addTask() {
+    // Your existing fetch code
+  }, []);
+
+  // ADD TASK FUNCTION STARTS HERE
+  async function addTask() {
     if (title.trim() === "") {
       alert("Please enter a task!");
       return;
     }
 
-    const newTask = {
-      id: Date.now(),
-      title: title,
-      completed: false,
-    };
+    try {
+      const response = await fetch(
+        "https://smart-todo-inyc.onrender.com/api/tasks/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: title,
+            description: "",
+            reminder_at: null,
+          }),
+        }
+      );
 
-    setTasks([...tasks, newTask]);
-    setTitle("");
+      if (!response.ok) {
+        throw new Error("Failed to add task");
+      }
+
+      const newTask = await response.json();
+
+      setTasks([...tasks, newTask]);
+      setTitle("");
+    } catch (error) {
+      console.error("Error adding task:", error);
+      alert("Could not add task. Please try again.");
+    }
   }
+  // ADD TASK FUNCTION ENDS HERE
 
-  function deleteTask(id) {
+  async function deleteTask(id) {
+  try {
+    const response = await fetch(
+      `https://smart-todo-inyc.onrender.com/api/tasks/${id}/`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to delete task");
+    }
+
     setTasks(tasks.filter((task) => task.id !== id));
+  } catch (error) {
+    console.error("Error deleting task:", error);
+    alert("Could not delete task. Please try again.");
   }
+}
 
   function completeTask(id) {
-    setTasks(
-      tasks.map((task) =>
-        task.id === id
-          ? { ...task, completed: !task.completed }
-          : task
-      )
-    );
+    // Your existing complete code
   }
+
+
+
+
 
   return (
     <div className="app">
