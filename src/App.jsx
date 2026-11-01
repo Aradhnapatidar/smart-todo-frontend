@@ -67,10 +67,41 @@ function App() {
   }
 }
 
-  function completeTask(id) {
-    // Your existing complete code
-  }
+ async function completeTask(id) {
+  const task = tasks.find((task) => task.id === id);
 
+  if (!task) return;
+
+  try {
+    const response = await fetch(
+      `https://smart-todo-inyc.onrender.com/api/tasks/${id}/`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          is_completed: !task.is_completed,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to update task");
+    }
+
+    const updatedTask = await response.json();
+
+    setTasks(
+      tasks.map((task) =>
+        task.id === id ? updatedTask : task
+      )
+    );
+  } catch (error) {
+    console.error("Error completing task:", error);
+    alert("Could not update task. Please try again.");
+  }
+}
 
 
 
@@ -98,7 +129,7 @@ function App() {
         tasks.map((task) => (
           <div className="task" key={task.id}>
             <span
-              className={task.completed ? "completed" : ""}
+              className={task.is_completed ? "completed" : ""}
               onClick={() => completeTask(task.id)}
             >
               {task.title}
