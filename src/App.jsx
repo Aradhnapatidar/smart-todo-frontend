@@ -2,8 +2,12 @@ import { useState , useEffect } from "react";
 import "react";
 
 function App() {
+  
+  const [title, setTitle] = useState("");
+  const [tasks, setTasks] = useState([]);
+
   useEffect(() => {
-    fetch("http://smart-todo-inyc.onrender.com/api/tasks/")
+    fetch("https://smart-todo-inyc.onrender.com/api/tasks/")
         .then(response => {
             if (!response.ok) {
                 throw new Error("Failed to fetch tasks");
